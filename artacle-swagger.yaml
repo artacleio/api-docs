@@ -1,0 +1,135 @@
+openapi: 3.0.0
+servers: []
+info:
+  description: >-
+      OpenAPI 3.0 based swagger docs for [Artacle](https://artacle.io) Public API.
+      
+      
+      An API Key is required to use the API. Contact us in our [Discord](https://discord.gg/dQYuBAsvMF) to request one.
+      
+      
+      We ask you to indicate in your app that the data was obtained from Artacle, i.e. by providing links to the Artacle website.
+  version: "1.0.0"
+  title: Artacle Public API
+
+paths:
+  /api/v1/collections:
+    get:
+      summary: Get list of NFT collections listed on Artacle.
+      description: |
+        Returns an array of all Artacle collections with their respective information such as Artacle slug, internal ID, etc. Pagination can be applied.
+      parameters:
+        - name: apiKey
+          in: query
+          required: true
+          description: API access key
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Max number of records to return
+          schema:
+            type: integer
+            maximum: 1000
+            default: 50
+        - name: offset
+          in: query
+          description: Number of records to skip for pagination
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: List of collections, paginated
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Collection'
+        '400':
+          description: bad input parameter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: server side error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+        - Collections
+  /api/v1/collections/{id}/rarity:
+    get:
+      tags:
+        - Rarity
+      summary: Get the Rarity Ranks information for all tokens in a collection
+      description: Returns an array of all collection tokens with their rarity ranks. Those tokens that does not have a rank assigned will also be returned, with rank set to null. The response will indicate whether rarity was calculated for all tokens or not.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: apiKey
+          in: query
+          required: true
+          description: API access key
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Max number of tokens to return
+          schema:
+            type: integer
+            maximum: 1000
+            default: 50
+        - name: offset
+          in: query
+          description: Number of tokens to skip for pagination
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: TBD
+components:
+  schemas:
+    Collection:
+      type: object
+      required:
+        - id
+        - subProjectId
+        - slug
+        - tokenAddress
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: Artacle internal collection identifier. It is required to further address collections in the API.
+          example: 78
+        subProjectId:
+          type: integer
+          format: int32
+          description: Identifier of a collection within a shared smart contract (like Art Blocks or Bright Moment). Set to null if a collection is not deployed on a shared smart contract (like Bored Apes Yacht Club)
+          example: 78
+        slug:
+          type: string
+          description: A unique human readable collection identifier used in Artacle collection URLs
+          example: fidenza
+        tokenAddress:
+          type: string
+          description: Smart contract address of the collection, always lowecase
+          minLength: 42
+          maxLength: 42
+          pattern: ^0x[a-fA-F0-9]{40}$
+          example: "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270"
+    Error:
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          example: incorrect limit or offset
