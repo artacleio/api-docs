@@ -1,11 +1,13 @@
 openapi: 3.0.0
-servers: []
+# servers: #[]
+#   - url: https://api.artacle.io/
+#     description: Artacle production endpoint. API Key is required
 info:
   description: >-
       OpenAPI 3.0 based swagger docs for [Artacle](https://artacle.io) Public API.
       
       
-      An API Key is required to use the API. Contact us in our [Discord](https://discord.gg/dQYuBAsvMF) to request one.
+      The API base URL is [https://api.artacle.io/v1/](https://api.artacle.io/v1/). An API Key is required to use the API. Contact us via [api@artacle.io](mailto:api@artacle.io) to request one. Please describe your project in short.
       
       
       We ask you to indicate in your app that the data was obtained from Artacle, i.e. by providing links to the Artacle website.
@@ -14,11 +16,11 @@ info:
 
 paths:
 # Collections List:
-  /api/v1/collections:
+  /collections:
     get:
       tags:
         - Collections
-      summary: Get list of NFT collections listed on Artacle.
+      summary: Get list of NFT collections listed on Artacle
       description: |
         Returns an array of all Artacle collections with their respective information such as Artacle slug, internal ID, etc. Pagination can be applied.
       parameters:
@@ -70,10 +72,10 @@ paths:
           $ref: "#/components/responses/InternalServerError"
                 
   # Collection Rarity
-  /api/v1/collections/{cid}/rarity:
+  /collections/{cid}/rarity:
     get:
       tags:
-        - Rarity
+        - Rarity Ranks
       summary: Get the Rarity Ranks information for all tokens in a collection
       description: Returns an array of all collection tokens with their rarity ranks. Those tokens that does not have a rank assigned will also be returned, with rank set to null. The response will indicate whether rarity was calculated for all tokens or not.
       parameters:
@@ -137,10 +139,10 @@ paths:
           $ref: "#/components/responses/InternalServerError"
           
 # Token Rarity
-  /api/v1/collections/{cid}/tokens/{tid}/rarity:
+  /collections/{cid}/tokens/{tid}/rarity:
     get:
       tags:
-        - Rarity
+        - Rarity Ranks
       summary: Get the Rarity Rank information for a specific token ID within a specific collection
       description: Returns the rarity rank for a specific token. The response will indicate whether rarity was calculated for all tokens in a collection or not.
       parameters:
@@ -210,6 +212,7 @@ components:
         subProjectId:
           type: integer
           format: int32
+          nullable: true
           description: Identifier of a collection within a shared smart contract (like Art Blocks or Bright Moment). Set to null if a collection is not deployed on a shared smart contract (like Bored Apes Yacht Club)
           example: 78
         slug:
@@ -221,7 +224,7 @@ components:
           description: Smart contract address of the collection, always lowecase
           minLength: 42
           maxLength: 42
-          pattern: ^0x[a-fA-F0-9]{40}$
+          pattern: ^0x[a-f0-9]{40}$
           example: "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270"
     TokenRarity:
       type: object
@@ -236,6 +239,7 @@ components:
         rank:
           type: integer
           format: int32
+          nullable: true
           description: Tokens Rarity Rank calculated by Artacle
           example: 1
     ErrorDetails:
